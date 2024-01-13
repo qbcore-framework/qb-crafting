@@ -1,6 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-RegisterNetEvent('player:useCraftingTable',function()
+RegisterNetEvent('player:useCraftingTable', function()
 
     local playerPed = PlayerPedId()
     local coordsP = GetOffsetFromEntityInWorldCoords(playerPed,0.0,1.0,1.0)
@@ -30,7 +30,7 @@ RegisterNetEvent('player:useCraftingTable',function()
     })
 end)
 
-RegisterNetEvent('crafting:pickupWorkbench',function()
+RegisterNetEvent('crafting:pickupWorkbench', function()
 
     local playerPed = PlayerPedId()
     local propHash = GetHashKey('prop_tool_bench02')
@@ -43,7 +43,7 @@ RegisterNetEvent('crafting:pickupWorkbench',function()
     end
 end)
 
-RegisterNetEvent('crafting:openMenu',function()
+RegisterNetEvent('crafting:openMenu', function()
 
     QBCore.Functions.TriggerCallback('crafting:getPlayerInventory', function(inventory)
         local craftableItems = {}
@@ -61,7 +61,7 @@ RegisterNetEvent('crafting:openMenu',function()
                     end
                 end
                 local itemLabel = QBCore.Shared.Items[reqItem.item].label
-                itemsText = itemsText ..' x' .. tostring(reqItem.amount)..' '.. itemLabel .. '<br>'
+                itemsText = itemsText .. ' x' .. tostring(reqItem.amount) .. ' ' .. itemLabel .. '<br>'
                 if not hasItem then
                     canCraft = false
                 end
