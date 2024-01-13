@@ -1,35 +1,64 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
+
+local function loadObjectModel(name, cb)
+    local model = type(name) == "string" and joaat(name) or name
+    local callback = cb and cb or function () end
+    if HasModelLoaded(model) then
+        callback(true)
+        return 
+    end
+
+    if not IsModelInCdimage(model) then
+        callback(false)
+        return 
+    end
+
+    RequestModel(model)
+    while not HasModelLoaded(model) do
+        Wait(5)
+    end
+
+    callback(true)
+end
+
+
 RegisterNetEvent('player:useCraftingTable', function()
     local playerPed = PlayerPedId()
     local coordsP = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 1.0, 1.0)
     local playerHeading = GetEntityHeading(PlayerPedId())
     local itemHeading = playerHeading - 90
-    local workbench = CreateObject(GetHashKey('prop_tool_bench02'), coordsP, true, true, true)
-    if itemHeading < 0 then itemHeading = 360 + itemHeading end
-    SetEntityHeading(workbench, itemHeading)
-    PlaceObjectOnGroundProperly(workbench)
-    TriggerServerEvent('crafting:removeCraftingTable')
-    exports['qb-target']:AddTargetModel(GetHashKey('prop_tool_bench02'), {
-        options = {
-            {
-                event = 'crafting:openMenu',
-                icon = 'fas fa-tools',
-                label = 'Crafting Menu'
-            },
-            {
-                event = 'crafting:pickupWorkbench',
-                icon = 'fas fa-hand-rock',
-                label = 'Pick Up Workbench'
-            }
-        },
-        distance = 2.5
-    })
+    local propHash = `prop_tool_bench02`
+    loadObjectModel(propHash, function(ret)
+        if ret then
+            local workbench = CreateObject(propHash, coordsP, true, true, true)
+            if itemHeading < 0 then itemHeading = 360 + itemHeading end
+            SetEntityHeading(workbench, itemHeading)
+            PlaceObjectOnGroundProperly(workbench)
+            TriggerServerEvent('crafting:removeCraftingTable')
+            exports['qb-target']:AddTargetModel(propHash, {
+                options = {
+                    {
+                        event = 'crafting:openMenu',
+                        icon = 'fas fa-tools',
+                        label = 'Crafting Menu'
+                    },
+                    {
+                        event = 'crafting:pickupWorkbench',
+                        icon = 'fas fa-hand-rock',
+                        label = 'Pick Up Workbench'
+                    }
+                },
+                distance = 2.5
+            })
+            SetModelAsNoLongerNeeded(prophash)
+        end
+    end)
 end)
 
 RegisterNetEvent('crafting:pickupWorkbench', function()
     local playerPed = PlayerPedId()
-    local propHash = GetHashKey('prop_tool_bench02')
+    local propHash = `prop_tool_bench02`
     local entity = GetClosestObjectOfType(GetEntityCoords(playerPed), 3.0, propHash, false, false, false)
     if DoesEntityExist(entity) then
         DeleteEntity(entity)
