@@ -2,7 +2,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 RegisterNetEvent('player:useCraftingTable', function()
     local playerPed = PlayerPedId()
-    local coordsP = GetOffsetFromEntityInWorldCoords(playerPed,0.0,1.0,1.0)
+    local coordsP = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 1.0, 1.0)
     local playerHeading = GetEntityHeading(PlayerPedId())
     local itemHeading = playerHeading - 90
     local workbench = CreateObject(GetHashKey('prop_tool_bench02'), coordsP, true, true, true)
