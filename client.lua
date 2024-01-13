@@ -1,18 +1,15 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
 RegisterNetEvent('player:useCraftingTable', function()
-
     local playerPed = PlayerPedId()
     local coordsP = GetOffsetFromEntityInWorldCoords(playerPed,0.0,1.0,1.0)
     local playerHeading = GetEntityHeading(PlayerPedId())
     local itemHeading = playerHeading - 90
     local workbench = CreateObject(GetHashKey('prop_tool_bench02'), coordsP, true, true, true)
-
     if itemHeading < 0 then itemHeading = 360 + itemHeading end
     SetEntityHeading(workbench, itemHeading)
     PlaceObjectOnGroundProperly(workbench)
     TriggerServerEvent('crafting:removeCraftingTable')
-
     exports['qb-target']:AddTargetModel(GetHashKey('prop_tool_bench02'), {
         options = {
             {
@@ -31,11 +28,9 @@ RegisterNetEvent('player:useCraftingTable', function()
 end)
 
 RegisterNetEvent('crafting:pickupWorkbench', function()
-
     local playerPed = PlayerPedId()
     local propHash = GetHashKey('prop_tool_bench02')
     local entity = GetClosestObjectOfType(GetEntityCoords(playerPed), 3.0, propHash, false, false, false)
-
     if DoesEntityExist(entity) then
         DeleteEntity(entity)
         TriggerServerEvent('crafting:addCraftingTable')
@@ -44,11 +39,9 @@ RegisterNetEvent('crafting:pickupWorkbench', function()
 end)
 
 RegisterNetEvent('crafting:openMenu', function()
-
     QBCore.Functions.TriggerCallback('crafting:getPlayerInventory', function(inventory)
         local craftableItems = {}
         local nonCraftableItems = {}
-
         for _, recipe in pairs(Config.Recipes) do
             local canCraft = true
             local itemsText = ''
@@ -86,7 +79,6 @@ RegisterNetEvent('crafting:openMenu', function()
                 table.insert(nonCraftableItems, menuItem)
             end
         end
-
         local Craft = {
             {
                 header = 'Crafting Menu',
@@ -100,13 +92,11 @@ RegisterNetEvent('crafting:openMenu', function()
         for _, item in ipairs(nonCraftableItems) do
             table.insert(Craft, item)
         end
-
         exports['qb-menu']:openMenu(Craft)
     end)
 end)
 
 RegisterNetEvent('crafting:requestCraftAmount', function(data)
-
     local dialog = exports['qb-input']:ShowInput({
         header = 'Enter Amount To Craft',
         submitText = 'Confirm',
@@ -123,7 +113,6 @@ RegisterNetEvent('crafting:requestCraftAmount', function(data)
     if dialog and tonumber(dialog.amount) then
         local amount = tonumber(dialog.amount)
         if amount > 0 then
-
             local multipliedItems = {}
             for _, reqItem in ipairs(data.requiredItems) do
                 table.insert(multipliedItems, {
@@ -141,13 +130,11 @@ RegisterNetEvent('crafting:requestCraftAmount', function(data)
 end)
 
 RegisterNetEvent('crafting:craftItem', function(data)
-
     QBCore.Functions.TriggerCallback('crafting:getPlayerInventory', function(inventory)
         local craftedItem = data.craftedItem
         local requiredItems = data.requiredItems
         local amountToCraft = data.amountToCraft
         local hasAllMaterials = true
-
         for _, reqItem in pairs(requiredItems) do
             local itemAmount = 0
             for _, invItem in pairs(inventory) do
@@ -162,7 +149,6 @@ RegisterNetEvent('crafting:craftItem', function(data)
                 break
             end
         end
-
         if hasAllMaterials then
             local ped = PlayerPedId()
             QBCore.Functions.Progressbar('crafting_item', 'Crafting '..QBCore.Shared.Items[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
