@@ -2,7 +2,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 RegisterNetEvent('player:useCraftingTable', function()
     local playerPed = PlayerPedId()
-    local coordsP = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 1.0, 1.0)
+    local coordsP = GetOffsetFromEntityInWorldCoords(playerPed,0.0,1.0,1.0)
     local playerHeading = GetEntityHeading(PlayerPedId())
     local itemHeading = playerHeading - 90
     local workbench = CreateObject(GetHashKey('prop_tool_bench02'), coordsP, true, true, true)
@@ -74,9 +74,9 @@ RegisterNetEvent('crafting:openMenu', function()
                 disabled = not canCraft
             }
             if canCraft then
-                table.insert(craftableItems, menuItem)
+                craftableItems[#craftableItems+1] = menuItem
             else
-                table.insert(nonCraftableItems, menuItem)
+                nonCraftableItems[#nonCraftableItems+1] = menuItem
             end
         end
         local Craft = {
@@ -87,10 +87,10 @@ RegisterNetEvent('crafting:openMenu', function()
             }
         }
         for _, item in ipairs(craftableItems) do
-            table.insert(Craft, item)
+            Craft[#Craft+1] = item
         end
         for _, item in ipairs(nonCraftableItems) do
-            table.insert(Craft, item)
+            Craft[#Craft+1] = item
         end
         exports['qb-menu']:openMenu(Craft)
     end)
@@ -115,10 +115,10 @@ RegisterNetEvent('crafting:requestCraftAmount', function(data)
         if amount > 0 then
             local multipliedItems = {}
             for _, reqItem in ipairs(data.requiredItems) do
-                table.insert(multipliedItems, {
+                multipliedItems[#multipliedItems+1] = {
                     item = reqItem.item,
                     amount = reqItem.amount * amount
-                })
+                }
             end
             TriggerEvent('crafting:craftItem', { craftedItem = data.craftedItem, requiredItems = multipliedItems, amountToCraft = amount })
         else
