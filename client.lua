@@ -15,12 +15,12 @@ RegisterNetEvent('player:useCraftingTable', function()
             {
                 event = 'crafting:openMenu',
                 icon = 'fas fa-tools',
-                label = 'Crafting Menu'
+                label = string.format(Lang:t("menus.header"))
             },
             {
                 event = 'crafting:pickupWorkbench',
                 icon = 'fas fa-hand-rock',
-                label = 'Pick Up Workbench'
+                label = string.format(Lang:t("menus.pickupworkBench"))
             }
         },
         distance = 2.5
@@ -34,7 +34,7 @@ RegisterNetEvent('crafting:pickupWorkbench', function()
     if DoesEntityExist(entity) then
         DeleteEntity(entity)
         TriggerServerEvent('crafting:addCraftingTable')
-        QBCore.Functions.Notify('You have picked up the workbench.', 'success')
+        QBCore.Functions.Notify(string.format(Lang:t("notifications.pickupBench")), 'success')
     end
 end)
 
@@ -81,7 +81,7 @@ RegisterNetEvent('crafting:openMenu', function()
         end
         local Craft = {
             {
-                header = 'Crafting Menu',
+                header = string.format(Lang:t("menus.header")),
                 icon = 'fas fa-drafting-compass',
                 isMenuHeader = true,
             }
@@ -98,7 +98,7 @@ end)
 
 RegisterNetEvent('crafting:requestCraftAmount', function(data)
     local dialog = exports['qb-input']:ShowInput({
-        header = 'Enter Amount To Craft',
+        header = string.format(Lang:t("menus.entercraftAmount")),
         submitText = 'Confirm',
         inputs = {
             {
@@ -122,10 +122,10 @@ RegisterNetEvent('crafting:requestCraftAmount', function(data)
             end
             TriggerEvent('crafting:craftItem', { craftedItem = data.craftedItem, requiredItems = multipliedItems, amountToCraft = amount })
         else
-            QBCore.Functions.Notify('Invalid amount entered', 'error')
+            QBCore.Functions.Notify(string.format(Lang:t("notifications.invalidAmount")), 'error')
         end
     else
-        QBCore.Functions.Notify('Invalid input', 'error')
+        QBCore.Functions.Notify(string.format(Lang:t("notifications.invalidInput")), 'error')
     end
 end)
 
@@ -145,7 +145,7 @@ RegisterNetEvent('crafting:craftItem', function(data)
             end
             if itemAmount < reqItem.amount then
                 hasAllMaterials = false
-                QBCore.Functions.Notify('Not enough materials to craft ' .. amountToCraft .. 'x ' .. QBCore.Shared.Items[craftedItem].label, 'error')
+                QBCore.Functions.Notify(string.format(Lang:t("notifications.notenoughMaterials")) .. amountToCraft .. 'x ' .. QBCore.Shared.Items[craftedItem].label, 'error')
                 break
             end
         end
@@ -165,10 +165,10 @@ RegisterNetEvent('crafting:craftItem', function(data)
                 TriggerServerEvent('crafting:receiveItem', craftedItem, requiredItems, amountToCraft)
             end, function() -- Cancel
                 StopAnimTask(ped, 'mini@repair', 'fixing_a_player', 1.0)
-                QBCore.Functions.Notify('Crafting cancelled', 'error')
+                QBCore.Functions.Notify(string.format(Lang:t("notifications.craftingCancelled")), 'error')
             end)
         else
-            QBCore.Functions.Notify('Not enough materials', 'error')
+            QBCore.Functions.Notify(string.format(Lang:t("notifications.notenoughMaterials")), 'error')
         end
     end)
 end)
