@@ -19,7 +19,7 @@ RegisterNetEvent('crafting:removeCraftingTable', function()
     if not Player then return end
     Player.Functions.RemoveItem('crafting_table', 1)
     TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['crafting_table'], 'remove')
-    TriggerClientEvent('QBCore:Notify', src, string.format(Lang:t("notifications.tablePlaced")), 'success')
+    TriggerClientEvent('QBCore:Notify', src, string.format(Lang:t('notifications.tablePlaced')), 'success')
 end)
 
 RegisterNetEvent('crafting:addCraftingTable', function()
@@ -45,6 +45,6 @@ RegisterNetEvent('crafting:receiveItem', function(craftedItem, requiredItems, am
     if canGive then
         Player.Functions.AddItem(craftedItem, amountToCraft)
         TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[craftedItem], 'add')
-        TriggerClientEvent('QBCore:Notify', src, string.format(Lang:t("notifications.craftMessage")) .. QBCore.Shared.Items[craftedItem].label, 'success')
+        TriggerClientEvent('QBCore:Notify', src, string.format(Lang:t('notifications.craftMessage'), QBCore.Shared.Items[craftedItem].label), 'success')
     end
 end)

@@ -5,22 +5,22 @@ RegisterNetEvent('player:useCraftingTable', function()
     local coordsP = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 1.0, 1.0)
     local playerHeading = GetEntityHeading(PlayerPedId())
     local itemHeading = playerHeading - 90
-    local workbench = CreateObject(GetHashKey('prop_tool_bench02'), coordsP, true, true, true)
+    local workbench = CreateObject(Config.TableObject, coordsP, true, true, true)
     if itemHeading < 0 then itemHeading = 360 + itemHeading end
     SetEntityHeading(workbench, itemHeading)
     PlaceObjectOnGroundProperly(workbench)
     TriggerServerEvent('crafting:removeCraftingTable')
-    exports['qb-target']:AddTargetModel(GetHashKey('prop_tool_bench02'), {
+    exports['qb-target']:AddTargetModel(Config.TableObject, {
         options = {
             {
                 event = 'crafting:openMenu',
                 icon = 'fas fa-tools',
-                label = string.format(Lang:t("menus.header"))
+                label = string.format(Lang:t('menus.header'))
             },
             {
                 event = 'crafting:pickupWorkbench',
                 icon = 'fas fa-hand-rock',
-                label = string.format(Lang:t("menus.pickupworkBench"))
+                label = string.format(Lang:t('menus.pickupworkBench'))
             }
         },
         distance = 2.5
@@ -29,12 +29,12 @@ end)
 
 RegisterNetEvent('crafting:pickupWorkbench', function()
     local playerPed = PlayerPedId()
-    local propHash = GetHashKey('prop_tool_bench02')
+    local propHash = Config.TableObject
     local entity = GetClosestObjectOfType(GetEntityCoords(playerPed), 3.0, propHash, false, false, false)
     if DoesEntityExist(entity) then
         DeleteEntity(entity)
         TriggerServerEvent('crafting:addCraftingTable')
-        QBCore.Functions.Notify(string.format(Lang:t("notifications.pickupBench")), 'success')
+        QBCore.Functions.Notify(string.format(Lang:t('notifications.pickupBench')), 'success')
     end
 end)
 
@@ -63,7 +63,7 @@ RegisterNetEvent('crafting:openMenu', function()
             local menuItem = {
                 header = QBCore.Shared.Items[recipe.item].label,
                 txt = itemsText,
-                icon = 'nui://qb-inventory/html/images/'..QBCore.Shared.Items[recipe.item].image,
+                icon = 'nui://qb-inventory/html/images/' .. QBCore.Shared.Items[recipe.item].image,
                 params = {
                     event = 'crafting:requestCraftAmount',
                     args = {
@@ -74,23 +74,23 @@ RegisterNetEvent('crafting:openMenu', function()
                 disabled = not canCraft
             }
             if canCraft then
-                craftableItems[#craftableItems+1] = menuItem
+                craftableItems[#craftableItems + 1] = menuItem
             else
-                nonCraftableItems[#nonCraftableItems+1] = menuItem
+                nonCraftableItems[#nonCraftableItems + 1] = menuItem
             end
         end
         local Craft = {
             {
-                header = string.format(Lang:t("menus.header")),
+                header = string.format(Lang:t('menus.header')),
                 icon = 'fas fa-drafting-compass',
                 isMenuHeader = true,
             }
         }
         for _, item in ipairs(craftableItems) do
-            Craft[#Craft+1] = item
+            Craft[#Craft + 1] = item
         end
         for _, item in ipairs(nonCraftableItems) do
-            Craft[#Craft+1] = item
+            Craft[#Craft + 1] = item
         end
         exports['qb-menu']:openMenu(Craft)
     end)
@@ -98,7 +98,7 @@ end)
 
 RegisterNetEvent('crafting:requestCraftAmount', function(data)
     local dialog = exports['qb-input']:ShowInput({
-        header = string.format(Lang:t("menus.entercraftAmount")),
+        header = string.format(Lang:t('menus.entercraftAmount')),
         submitText = 'Confirm',
         inputs = {
             {
@@ -106,7 +106,7 @@ RegisterNetEvent('crafting:requestCraftAmount', function(data)
                 name = 'amount',
                 label = 'Amount',
                 text = 'Enter Amount',
-                isRequired = true 
+                isRequired = true
             },
         },
     })
@@ -115,17 +115,17 @@ RegisterNetEvent('crafting:requestCraftAmount', function(data)
         if amount > 0 then
             local multipliedItems = {}
             for _, reqItem in ipairs(data.requiredItems) do
-                multipliedItems[#multipliedItems+1] = {
+                multipliedItems[#multipliedItems + 1] = {
                     item = reqItem.item,
                     amount = reqItem.amount * amount
                 }
             end
             TriggerEvent('crafting:craftItem', { craftedItem = data.craftedItem, requiredItems = multipliedItems, amountToCraft = amount })
         else
-            QBCore.Functions.Notify(string.format(Lang:t("notifications.invalidAmount")), 'error')
+            QBCore.Functions.Notify(string.format(Lang:t('notifications.invalidAmount')), 'error')
         end
     else
-        QBCore.Functions.Notify(string.format(Lang:t("notifications.invalidInput")), 'error')
+        QBCore.Functions.Notify(string.format(Lang:t('notifications.invalidInput')), 'error')
     end
 end)
 
@@ -145,13 +145,13 @@ RegisterNetEvent('crafting:craftItem', function(data)
             end
             if itemAmount < reqItem.amount then
                 hasAllMaterials = false
-                QBCore.Functions.Notify(string.format(Lang:t("notifications.notenoughMaterials")) .. amountToCraft .. 'x ' .. QBCore.Shared.Items[craftedItem].label, 'error')
+                QBCore.Functions.Notify(string.format(Lang:t('notifications.notenoughMaterials')) .. amountToCraft .. 'x ' .. QBCore.Shared.Items[craftedItem].label, 'error')
                 break
             end
         end
         if hasAllMaterials then
             local ped = PlayerPedId()
-            QBCore.Functions.Progressbar('crafting_item', 'Crafting '..QBCore.Shared.Items[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
+            QBCore.Functions.Progressbar('crafting_item', 'Crafting ' .. QBCore.Shared.Items[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
                 disableMovement = true,
                 disableCarMovement = true,
                 disableMouse = false,
@@ -165,10 +165,10 @@ RegisterNetEvent('crafting:craftItem', function(data)
                 TriggerServerEvent('crafting:receiveItem', craftedItem, requiredItems, amountToCraft)
             end, function() -- Cancel
                 StopAnimTask(ped, 'mini@repair', 'fixing_a_player', 1.0)
-                QBCore.Functions.Notify(string.format(Lang:t("notifications.craftingCancelled")), 'error')
+                QBCore.Functions.Notify(string.format(Lang:t('notifications.craftingCancelled')), 'error')
             end)
         else
-            QBCore.Functions.Notify(string.format(Lang:t("notifications.notenoughMaterials")), 'error')
+            QBCore.Functions.Notify(string.format(Lang:t('notifications.notenoughMaterials')), 'error')
         end
     end)
 end)
