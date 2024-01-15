@@ -3,9 +3,14 @@ game 'gta5'
 
 description 'QB-Crafting'
 version '1.0.0'
-shared_script 'config.lua'
+shared_scripts {
+    '@qb-core/shared/locale.lua',
+    'locales/en.lua',
+    'locales/*.lua',
+    'config.lua'
+}
 
-client_script 'crafting_cl.lua'
-server_script 'crafting_sv.lua'
+client_script 'client.lua'
+server_script 'server.lua'
 
 lua54 'yes'
