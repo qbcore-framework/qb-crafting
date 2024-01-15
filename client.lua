@@ -30,7 +30,7 @@ local function CraftItem(craftedItem, requiredItems, amountToCraft, xpEarned, xp
                 anim = 'fixing_a_player',
                 flags = 16,
             }, {}, {}, function()
-                TriggerServerEvent('crafting:receiveItem', craftedItem, requiredItems, amountToCraft, xpEarned, xpType)
+                TriggerServerEvent('qb-crafting:server:receiveItem', craftedItem, requiredItems, amountToCraft, xpEarned, xpType)
             end)
         else
             QBCore.Functions.Notify(string.format(Lang:t('notifications.notenoughMaterials')), 'error')
@@ -142,7 +142,7 @@ local function PickupBench(benchType)
     local entity = GetClosestObjectOfType(GetEntityCoords(playerPed), 3.0, propHash, false, false, false)
     if DoesEntityExist(entity) then
         DeleteEntity(entity)
-        TriggerServerEvent('crafting:addCraftingTable', benchType)
+        TriggerServerEvent('qb-crafting:server:addCraftingTable', benchType)
         QBCore.Functions.Notify(string.format(Lang:t('notifications.pickupBench')), 'success')
     end
 end
@@ -158,7 +158,7 @@ RegisterNetEvent('qb-crafting:client:useCraftingTable', function(benchType)
     if itemHeading < 0 then itemHeading = 360 + itemHeading end
     SetEntityHeading(workbench, itemHeading)
     PlaceObjectOnGroundProperly(workbench)
-    TriggerServerEvent('crafting:removeCraftingTable', benchType)
+    TriggerServerEvent('qb-crafting:server:removeCraftingTable', benchType)
     exports['qb-target']:AddTargetModel(Config[benchType].object, {
         options = {
             {
