@@ -32,7 +32,17 @@ RegisterNetEvent('crafting:addCraftingTable', function(benchType)
     TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[benchType], 'add')
 end)
 
-RegisterNetEvent('crafting:receiveItem', function(craftedItem, requiredItems, amountToCraft)
+local function IncreasePlayerXP(source, xpGain, xpType)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player then
+        local currentXP = Player.PlayerData.metadata[xpType] or 0
+        local newXP = currentXP + xpGain
+        Player.Functions.SetMetaData(xpType, newXP)
+        TriggerClientEvent('QBCore:Notify', source, string.format(Lang:t('notifications.xpGain'), xpGain, xpType), 'success')
+    end
+end
+
+RegisterNetEvent('crafting:receiveItem', function(craftedItem, requiredItems, amountToCraft, xpGain, xpType)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if not Player then return end
@@ -48,16 +58,7 @@ RegisterNetEvent('crafting:receiveItem', function(craftedItem, requiredItems, am
         Player.Functions.AddItem(craftedItem, amountToCraft)
         TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[craftedItem], 'add')
         TriggerClientEvent('QBCore:Notify', src, string.format(Lang:t('notifications.craftMessage'), QBCore.Shared.Items[craftedItem].label), 'success')
+        IncreasePlayerXP(src, xpGain, xpType)
     end
 end)
 
-RegisterNetEvent('crafting:increaseXP', function(xpGain, xpType)
-    local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
-    if Player then
-        local currentXP = Player.PlayerData.metadata[xpType] or 0
-        local newXP = currentXP + xpGain
-        Player.Functions.SetMetaData(xpType, newXP)
-        TriggerClientEvent('QBCore:Notify', src, string.format(Lang:t('notifications.xpGain'), xpGain, xpType), 'success')
-    end
-end)

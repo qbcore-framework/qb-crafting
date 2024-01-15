@@ -183,8 +183,7 @@ RegisterNetEvent('crafting:craftItem', function(data)
                 flags = 16,
             }, {}, {}, function() -- Done
                 StopAnimTask(ped, 'mini@repair', 'fixing_a_player', 1.0)
-                TriggerServerEvent('crafting:receiveItem', craftedItem, requiredItems, amountToCraft)
-                TriggerServerEvent('crafting:increaseXP', xpEarned, xpType)
+                TriggerServerEvent('crafting:receiveItem', craftedItem, requiredItems, amountToCraft, xpEarned, xpType)
             end, function() -- Cancel
                 StopAnimTask(ped, 'mini@repair', 'fixing_a_player', 1.0)
                 QBCore.Functions.Notify(string.format(Lang:t('notifications.craftingCancelled')), 'error')
