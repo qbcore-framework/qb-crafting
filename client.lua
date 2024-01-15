@@ -102,7 +102,7 @@ local function OpenCraftingMenu(benchType)
                 local menuItem = {
                     header = QBCore.Shared.Items[recipe.item].label,
                     txt = itemsText,
-                    icon = 'nui://qb-inventory/html/images/' .. QBCore.Shared.Items[recipe.item].image,
+                    icon = Config.ImageBasePath .. QBCore.Shared.Items[recipe.item].image,
                     params = {
                         isAction = true,
                         event = function()
