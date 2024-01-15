@@ -1,4 +1,5 @@
 Config = {
+    ImageBasePath = "nui://qb-inventory/html/images/",    
     item_bench = {
         object = `prop_tool_bench02`,
         xpType = 'craftingrep',
