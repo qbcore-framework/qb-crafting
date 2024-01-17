@@ -20,18 +20,42 @@ local function CraftItem(craftedItem, requiredItems, amountToCraft, xpEarned, xp
             end
         end
         if hasAllMaterials then
-            QBCore.Functions.Progressbar('crafting_item', 'Crafting ' .. QBCore.Shared.Items[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
-                disableMovement = true,
-                disableCarMovement = true,
-                disableMouse = false,
-                disableCombat = true,
-            }, {
-                animDict = 'mini@repair',
-                anim = 'fixing_a_player',
-                flags = 16,
-            }, {}, {}, function()
-                TriggerServerEvent('qb-crafting:server:receiveItem', craftedItem, requiredItems, amountToCraft, xpEarned, xpType)
-            end)
+            if Config.EnableSkillCheck then
+                local success = exports['qb-minigames']:Skillbar('easy', '12345') -- difficulty and words to enter 
+                if success then
+                    QBCore.Functions.Progressbar('crafting_item', 'Crafting ' .. QBCore.Shared.Items[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
+                        disableMovement = true,
+                        disableCarMovement = true,
+                        disableMouse = false,
+                        disableCombat = true,
+                    }, {
+                        animDict = 'mini@repair',
+                        anim = 'fixing_a_player',
+                        flags = 16,
+                    }, {}, {}, function()
+                        TriggerServerEvent('qb-crafting:server:receiveItem', craftedItem, requiredItems, amountToCraft, xpEarned, xpType)
+                    end)
+                else
+                    -- Remove a random number of required materials from the player's inventory
+                    local randomItem = requiredItems[math.random(#requiredItems)]
+                    local randomAmount = math.random(1, randomItem.amount)
+                    TriggerServerEvent('qb-crafting:server:removeMaterials', randomItem.item, randomAmount)
+                    QBCore.Functions.Notify('Crafting failed, some materials have been lost!', 'error')
+                end
+            else
+                QBCore.Functions.Progressbar('crafting_item', 'Crafting ' .. QBCore.Shared.Items[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
+                    disableMovement = true,
+                    disableCarMovement = true,
+                    disableMouse = false,
+                    disableCombat = true,
+                }, {
+                    animDict = 'mini@repair',
+                    anim = 'fixing_a_player',
+                    flags = 16,
+                }, {}, {}, function()
+                    TriggerServerEvent('qb-crafting:server:receiveItem', craftedItem, requiredItems, amountToCraft, xpEarned, xpType)
+                end)
+            end
         else
             QBCore.Functions.Notify(string.format(Lang:t('notifications.notenoughMaterials')), 'error')
         end
