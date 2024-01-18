@@ -24,6 +24,14 @@ QBCore.Functions.CreateCallback('crafting:getPlayerInventory', function(source, 
 end)
 
 -- Events
+RegisterServerEvent('qb-crafting:server:removeMaterials', function(itemName, amount)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player then
+        Player.Functions.RemoveItem(itemName, amount)
+        TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[itemName], 'remove')
+    end
+end)
 
 RegisterNetEvent('qb-crafting:server:removeCraftingTable', function(benchType)
     local src = source
