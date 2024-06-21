@@ -183,7 +183,7 @@ RegisterNetEvent('qb-crafting:client:useCraftingTable', function(benchType)
     SetEntityHeading(workbench, itemHeading)
     PlaceObjectOnGroundProperly(workbench)
     TriggerServerEvent('qb-crafting:server:removeCraftingTable', benchType)
-    exports['qb-target']:AddTargetEntity(Config[benchType].object, {
+    exports['qb-target']:AddTargetEntity(workbench, {
         options = {
             {
                 icon = 'fas fa-tools',
