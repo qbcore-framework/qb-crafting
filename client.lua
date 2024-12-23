@@ -4,15 +4,14 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 local function CraftItem(craftedItem, requiredItems, amountToCraft, xpEarned, xpType)
     QBCore.Functions.TriggerCallback('crafting:getPlayerInventory', function(inventory)
+        local inventoryDict = {}
+        for _, invItem in pairs(inventory) do
+            inventoryDict[invItem.name] = invItem.amount
+        end
+
         local hasAllMaterials = true
         for _, reqItem in pairs(requiredItems) do
-            local itemAmount = 0
-            for _, invItem in pairs(inventory) do
-                if invItem.name == reqItem.item then
-                    itemAmount = invItem.amount
-                    break
-                end
-            end
+            local itemAmount = inventoryDict[reqItem.item] or 0
             if itemAmount < reqItem.amount then
                 hasAllMaterials = false
                 QBCore.Functions.Notify(string.format(Lang:t('notifications.notenoughMaterials')) .. amountToCraft .. 'x ' .. QBCore.Shared.Items[craftedItem].label, 'error')
@@ -97,9 +96,9 @@ end
 
 local function OpenCraftingMenu(benchType)
     local PlayerData = QBCore.Functions.GetPlayerData()
-    local xpType = benchType == 'item_bench' and Config.item_bench.xpType or Config.attachment_bench.xpType
-    local recipes = benchType == 'item_bench' and Config.item_bench.recipes or Config.attachment_bench.recipes
-    local currentXP = PlayerData.metadata[xpType]
+    local xpType = benchType == 'item_bench' and Config.Benches.item_bench.xpType or Config.Benches.attachment_bench.xpType
+    local recipes = benchType == 'item_bench' and Config.Benches.item_bench.recipes or Config.Benches.attachment_bench.recipes
+    local currentXP = PlayerData.metadata.rep[xpType] and PlayerData.metadata.rep[xpType] or 0
 
     QBCore.Functions.TriggerCallback('crafting:getPlayerInventory', function(inventory)
         local craftableItems = {}
@@ -160,47 +159,44 @@ local function OpenCraftingMenu(benchType)
     end)
 end
 
-local function PickupBench(benchType)
-    local playerPed = PlayerPedId()
-    local propHash = Config[benchType].object
-    local entity = GetClosestObjectOfType(GetEntityCoords(playerPed), 3.0, propHash, false, false, false)
-    if DoesEntityExist(entity) then
-        DeleteEntity(entity)
-        TriggerServerEvent('qb-crafting:server:addCraftingTable', benchType)
-        QBCore.Functions.Notify(string.format(Lang:t('notifications.pickupBench')), 'success')
-    end
-end
-
 -- Events
 
-RegisterNetEvent('qb-crafting:client:useCraftingTable', function(benchType)
-    local playerPed = PlayerPedId()
-    local coordsP = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 1.0, 1.0)
-    local playerHeading = GetEntityHeading(PlayerPedId())
-    local itemHeading = playerHeading - 90
-    local workbench = CreateObject(Config[benchType].object, coordsP, true, true, true)
-    if itemHeading < 0 then itemHeading = 360 + itemHeading end
-    SetEntityHeading(workbench, itemHeading)
-    PlaceObjectOnGroundProperly(workbench)
-    TriggerServerEvent('qb-crafting:server:removeCraftingTable', benchType)
-    exports['qb-target']:AddTargetEntity(workbench, {
+-- Function to add a target to a tool chest
+local function addTargetToToolChest(entity, benchType)
+    exports['qb-target']:AddTargetEntity(entity, {
         options = {
             {
-                icon = 'fas fa-tools',
+                event = "qb-crafting:client:useToolChest",
+                icon = "fas fa-tools",
                 label = string.format(Lang:t('menus.header')),
-                action = function()
-                    OpenCraftingMenu(benchType)
-                end
+                parameters = { benchType = benchType }
             },
-            {
-                event = 'crafting:pickupWorkbench',
-                icon = 'fas fa-hand-rock',
-                label = string.format(Lang:t('menus.pickupworkBench')),
-                action = function()
-                    PickupBench(benchType)
-                end,
-            }
         },
         distance = 2.5
     })
+end
+
+-- Find all tool chests and add targets when the resource starts
+CreateThread(function()
+    local benchHashes = {}
+    for benchType, benchData in pairs(Config.Benches) do
+        benchHashes[benchType] = GetHashKey(benchData.object)
+    end
+
+    while true do
+        Wait(10000)
+
+        for benchType, benchHash in pairs(benchHashes) do
+            for _, entity in ipairs(GetGamePool('CObject')) do
+                if GetEntityModel(entity) == benchHash then
+                    addTargetToToolChest(entity, benchType)
+                end
+            end
+        end
+    end
+end)
+
+-- Register the event to handle the interaction
+RegisterNetEvent("qb-crafting:client:useToolChest", function(data)
+    OpenCraftingMenu(data.parameters.benchType)
 end)

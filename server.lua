@@ -33,23 +33,6 @@ RegisterServerEvent('qb-crafting:server:removeMaterials', function(itemName, amo
     end
 end)
 
-RegisterNetEvent('qb-crafting:server:removeCraftingTable', function(benchType)
-    local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
-    if not Player then return end
-    exports['qb-inventory']:RemoveItem(src, benchType, 1, false, 'qb-crafting:server:removeCraftingTable')
-    TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[benchType], 'remove')
-    TriggerClientEvent('QBCore:Notify', src, Lang:t('notifications.tablePlace'), 'success')
-end)
-
-RegisterNetEvent('qb-crafting:server:addCraftingTable', function(benchType)
-    local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
-    if not Player then return end
-    if not exports['qb-inventory']:AddItem(src, benchType, 1, false, false, 'qb-crafting:server:addCraftingTable') then return end
-    TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[benchType], 'add')
-end)
-
 RegisterNetEvent('qb-crafting:server:receiveItem', function(craftedItem, requiredItems, amountToCraft, xpGain, xpType)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
@@ -69,11 +52,3 @@ RegisterNetEvent('qb-crafting:server:receiveItem', function(craftedItem, require
         IncreasePlayerXP(src, xpGain, xpType)
     end
 end)
-
--- Items
-
-for benchType, _ in pairs(Config) do
-    QBCore.Functions.CreateUseableItem(benchType, function(source)
-        TriggerClientEvent('qb-crafting:client:useCraftingTable', source, benchType)
-    end)
-end
