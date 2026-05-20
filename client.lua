@@ -1,4 +1,5 @@
-local QBCore = exports['qb-core']:GetCoreObject()
+local QBCore = exports['qb-core']:GetCoreObject({ 'Functions' })
+local sharedItems = exports['qb-core']:GetShared('Items')
 
 -- Functions
 
@@ -15,15 +16,15 @@ local function CraftItem(craftedItem, requiredItems, amountToCraft, xpEarned, xp
             end
             if itemAmount < reqItem.amount then
                 hasAllMaterials = false
-                QBCore.Functions.Notify(string.format(Lang:t('notifications.notenoughMaterials')) .. amountToCraft .. 'x ' .. QBCore.Shared.Items[craftedItem].label, 'error')
+                QBCore.Functions.Notify(string.format(Lang:t('notifications.notenoughMaterials')) .. amountToCraft .. 'x ' .. sharedItems[craftedItem].label, 'error')
                 break
             end
         end
         if hasAllMaterials then
             if Config.EnableSkillCheck then
-                local success = exports['qb-minigames']:Skillbar('easy', '12345') -- difficulty and words to enter 
+                local success = exports['qb-minigames']:Skillbar('easy', '12345') -- difficulty and words to enter
                 if success then
-                    QBCore.Functions.Progressbar('crafting_item', 'Crafting ' .. QBCore.Shared.Items[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
+                    QBCore.Functions.Progressbar('crafting_item', 'Crafting ' .. sharedItems[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
                         disableMovement = true,
                         disableCarMovement = true,
                         disableMouse = false,
@@ -43,7 +44,7 @@ local function CraftItem(craftedItem, requiredItems, amountToCraft, xpEarned, xp
                     QBCore.Functions.Notify('Crafting failed, some materials have been lost!', 'error')
                 end
             else
-                QBCore.Functions.Progressbar('crafting_item', 'Crafting ' .. QBCore.Shared.Items[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
+                QBCore.Functions.Progressbar('crafting_item', 'Crafting ' .. sharedItems[craftedItem].label, (math.random(2000, 5000) * amountToCraft), false, true, {
                     disableMovement = true,
                     disableCarMovement = true,
                     disableMouse = false,
@@ -116,7 +117,7 @@ local function OpenCraftingMenu(benchType)
                             break
                         end
                     end
-                    local itemLabel = QBCore.Shared.Items[reqItem.item].label
+                    local itemLabel = sharedItems[reqItem.item].label
                     itemsText = itemsText .. ' x' .. tostring(reqItem.amount) .. ' ' .. itemLabel .. '<br>'
                     if not hasItem then
                         canCraft = false
@@ -124,9 +125,9 @@ local function OpenCraftingMenu(benchType)
                 end
                 itemsText = string.sub(itemsText, 1, -5)
                 local menuItem = {
-                    header = QBCore.Shared.Items[recipe.item].label,
+                    header = sharedItems[recipe.item].label,
                     txt = itemsText,
-                    icon = Config.ImageBasePath .. QBCore.Shared.Items[recipe.item].image,
+                    icon = Config.ImageBasePath .. sharedItems[recipe.item].image,
                     params = {
                         isAction = true,
                         event = function()
